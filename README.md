@@ -3,16 +3,19 @@
 I have been building an eCommerce type application and want to share some of the approaches to designing and programming that I’ve used. The general idea behind this app is that a user’s role is set so they are buying or selling goods with a fixed disposition. This means that a user would not be both buying and selling within the market. The intent is also to promote local trade, so searching isn’t done for large distances. Examples of these types of markets are catering/food prep, landscaping services, or artwork (especially commissioned). Essentially, the market is composed of sellers that have some kind of specialized service or product instead of a market in which users buy and sell items they have not produced themselves. Both buyers and sellers can post listings. The application has standard features like user accounts, posting listings, saving listings, contacting users, and searching for listings.
 <br><br>
 The following examples are abstractions of what is actually written in the app. They are meant to illustrate the design patterns I’ve used to address certain problems. As such, they do not depict full implementations that would potentially include other code, like aria attributes or the complete range of event handlers needed for proper UI responsiveness. They also are not bound to a particular directory structure, so the import statements are vague. If the same file is referenced multiple times, or in multiple examples, it will be designated with a name that will stay consistent throughout the entire document. Assume this is a single page application with some type of client-side routing framework like React Router or Remix. 
-<br><br>
-A brief explanation of React Router:<br>
-React Router uses client-side navigation, which means that when navigation actions happen in the browser a GET request will return only a page’s dynamic data instead of returning a full HTML file. Intra-app navigations happen when either a form is submitted, or a link is clicked. With React Router, a single page is defined by a component, which is mapped to a URL. When that URL is present in the address bar the component will mount to the DOM. Functions can be connected to these components to run either when the component is mounted (“loader”), or when a form is submitted (“action”). A loader function is used to make HTTP requests that fill the page with data. Action functions can be used to submit Fetch requests with form data.
 
 ### Table of Contents
+  - [Explanation of React Router](#a-brief-explanation-of-react-router) 
   - [Client side user data cache](#client-side-user-data-cache)
   - [Loading](#loading)
+  - [.then() vs async/await](#then-vs-asyncawait)
+  - [Code splitting](#code-splitting)
+  - [&lt;ConfirmAction&gt; component](#confirmaction-component)
+  - [Modular CSS](#modular-css)
 
+### A brief explanation of React Router:
+React Router uses client-side navigation, which means that when navigation actions happen in the browser a GET request will return only a page’s dynamic data instead of returning a full HTML file. Intra-app navigations happen when either a form is submitted, or a link is clicked. With React Router, a single page is defined by a component, which is mapped to a URL. When that URL is present in the address bar the component will mount to the DOM. Functions can be connected to these components to run either when the component is mounted (“loader”), or when a form is submitted (“action”). A loader function is used to make HTTP requests that fill the page with data. Action functions can be used to submit Fetch requests with form data.
 ### Client-side user data cache
-
 I wanted to implement a quick search feature so that signed in users would not have to enter redundant information, mainly their location and search market, every time they wanted to search for listings. This requires information to be present in the browser at the time of the search. It might not be a terrible idea to store this data in the session object on the server and then access it as the search request comes in, but this could become memory intensive and may not scale well if many users end up using the application at once. There are also other components, aside from the quick search, in the client where this kind of information can be used.
 <br><br>
 The next potential solution would be one of the two WebStorage APIs. This could be a viable option because the data being stored isn’t sensitive and is easily found on a user’s public profile. sessionStorage would not be a good idea because it’s not shared across browser tabs, so localStorage would have to be used.
@@ -33,7 +36,7 @@ Notes:
 <br>
 The &lt;h1&gt; elements describing <main> are all defined in what would be the current page as designated by <Outlet/>. This allows flexibility and removes the need to write a <main> element in each of the page components.
 <br><br>
-A brief explanation of the useEffect syntax can be found below.
+A brief explanation of the useEffect syntax can be found [below](#then-vs-asyncawait).
 <br><br>
 The quick search component could be implemented as follows.
 <br><br>
@@ -113,7 +116,7 @@ Error handling would also need to be added in with either a full try/catch, as s
 ![alt text](https://github.com/user-attachments/assets/f68fdd08-4de4-4b75-af24-7feb5b0fbf60)
 <br><br>
 By using then(), the extra wrapper doesn’t need to be created around the function call. There also isn’t a need to use the promise value again later in the setup function (setting state is the only action performed with this value) so this syntax fits the structure well.
-### Code bundling
+### Code splitting
 I specifically used Webpack and SWC to create static asset bundles. When it comes to code splitting, it’s straightforward to separate files like utilities and the data service layer into different bundles but splitting up a web of component dependencies is less straightforward. I decided to take advantage of dynamic imports to lazy load components that would likely not need to be immediately accessed by the user. This works as expected, with Webpack designating the dynamically imported file as a separate chunk, but if the application is truly modular with components spread out across multiple files this can create another problem with once again having too many smaller individual files. This remains the case even with minSize set lower on the SplitChunksPlugin object because the dynamic import is only importing one file at a time.
 <br><br>
 The way I addressed this was by creating a “lazy-index” barrel file in which the components intended to be lazy-loaded are imported, then exported. Then the main app.js file, which defines the router, can dynamically import this index file. This results in all of these lazy-loaded components being bundled together.
@@ -144,7 +147,7 @@ confirm_action.js:
 <br><br>
 The component takes 5 props:
 - componentName: string<br>
-&nbsp;&nbsp;&nbsp;&nbsp;The name of the parent component. See modular CSS
+&nbsp;&nbsp;&nbsp;&nbsp;The name of the parent component. See [modular CSS](#modular-css)
 - buttonFor: string<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Essentially a name that can be used to further distinguish individual buttons in the event there are multiple buttons in a single component.
 - buttonText: string<br>
