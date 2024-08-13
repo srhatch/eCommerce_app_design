@@ -30,11 +30,11 @@ app_context.js:
 <br>
 ![alt text](https://github.com/user-attachments/assets/ab4eea48-e6e5-4168-815a-3dc19548bb2a)
 <br><br>
-Again, assuming a React Router or Remix type structure, &lt;Outlet/&gt; would contain the rest of the components in the app. Whenever there is a full-page refresh, &lt;AppContext&gt; will make an HTTP request with getUserCacheData() and then update its state. getUserCacheData() is a promise returning function that can be defined in a data service layer. This layer would also be responsible for handling any errors coming back from the server, so the useEffect() setup function is only concerned with updating userCache.
+Again, assuming a React Router or Remix type structure, &lt;Outlet&gt; would contain the rest of the components in the app. Whenever there is a full-page refresh, &lt;AppContext&gt; will make an HTTP request with getUserCacheData() and then update its state. getUserCacheData() is a promise returning function that can be defined in a data service layer. This layer would also be responsible for handling any errors coming back from the server, so the useEffect() setup function is only concerned with updating userCache.
 <br><br>
 Notes:
 <br>
-The &lt;h1&gt; elements describing &lt;main&gt; are all defined in what would be the current page as designated by &lt;Outlet/&gt;. This allows flexibility and removes the need to write a &lt;main&gt; element in each of the page components.
+The &lt;h1&gt; elements describing &lt;main&gt; are all defined in what would be the current page as designated by &lt;Outlet&gt;. This allows flexibility and removes the need to write a &lt;main&gt; element in each of the page components.
 <br><br>
 A brief explanation of the useEffect() syntax can be found [below](#then-vs-asyncawait).
 <br><br>
